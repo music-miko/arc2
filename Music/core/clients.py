@@ -43,8 +43,8 @@ class HellClient(Client):
             self.user.name = me.first_name
             self.user.username = me.username
             try:
-                await self.user.join_chat("Its_HellBot")
-                await self.user.join_chat("https://t.me/joinchat/LUzuM9rrEdIwZTFl")
+                await self.user.join_chat("ArcUpdates")
+                await self.user.join_chat("ArcChatz")
             except:
                 pass
             LOGS.info(f"\x3e\x3e\x20{self.user.name}\x20\x69\x73\x20\x6f\x6e\x6c\x69\x6e\x65\x20\x6e\x6f\x77\x21")
