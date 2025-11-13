@@ -11,7 +11,7 @@ from .logger import LOGS
 class Database(object):
     def __init__(self):
         self.client = AsyncIOMotorClient(Config.DATABASE_URL)
-        self.db = self.client["deadline"]
+        self.db = self.client["anon"]
 
         # mongo db collections
         self.authchats = self.db.authchats
