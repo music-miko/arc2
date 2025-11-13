@@ -8,6 +8,7 @@ from .logger import LOGS
 
 class HellClient(Client):
     def __init__(self):
+        # Main bot client
         self.app = Client(
             "HellMusic",
             api_id=Config.API_ID,
@@ -17,16 +18,50 @@ class HellClient(Client):
             workers=100,
         )
 
-        self.user = Client(
-            "HellClient",
-            api_id=Config.API_ID,
-            api_hash=Config.API_HASH,
-            session_string=Config.HELLBOT_SESSION,
-            no_updates=True,
-        )
+        # List to store all assistant userbots
+        self.user_bots = []
+
+        # Helper to create a userbot client
+        def _make_user(session_name: str, session_string: str) -> Client:
+            return Client(
+                session_name,
+                api_id=Config.API_ID,
+                api_hash=Config.API_HASH,
+                session_string=session_string,
+                no_updates=True,
+            )
+
+        # Assistant 1 (original one)
+        self.user = None
+        if getattr(Config, "HELLBOT_SESSION", None):
+            self.user = _make_user("HellClient", Config.HELLBOT_SESSION)
+            self.user_bots.append(self.user)
+
+        # Assistant 2
+        self.user2 = None
+        if getattr(Config, "HELLBOT_SESSION2", None):
+            self.user2 = _make_user("HellClient2", Config.HELLBOT_SESSION2)
+            self.user_bots.append(self.user2)
+
+        # Assistant 3
+        self.user3 = None
+        if getattr(Config, "HELLBOT_SESSION3", None):
+            self.user3 = _make_user("HellClient3", Config.HELLBOT_SESSION3)
+            self.user_bots.append(self.user3)
+
+        # Assistant 4
+        self.user4 = None
+        if getattr(Config, "HELLBOT_SESSION4", None):
+            self.user4 = _make_user("HellClient4", Config.HELLBOT_SESSION4)
+            self.user_bots.append(self.user4)
+
+        # Optional: list of assistant info (id, name, etc.)
+        self.assistants = []
 
     async def start(self):
-        LOGS.info("\x3e\x3e\x20\x42\x6f\x6f\x74\x69\x6e\x67\x20\x75\x70\x20\x48\x65\x6c\x6c\x4d\x75\x73\x69\x63\x2e\x2e\x2e")
+        LOGS.info(">> Booting up HellMusic...")
+
+        # Start bot
         if Config.BOT_TOKEN:
             await self.app.start()
             me = await self.app.get_me()
@@ -34,21 +69,41 @@ class HellClient(Client):
             self.app.mention = me.mention
             self.app.name = me.first_name
             self.app.username = me.username
-            LOGS.info(f"\x3e\x3e\x20{self.app.name}\x20\x69\x73\x20\x6f\x6e\x6c\x69\x6e\x65\x20\x6e\x6f\x77\x21")
-        if Config.HELLBOT_SESSION:
-            await self.user.start()
-            me = await self.user.get_me()
-            self.user.id = me.id
-            self.user.mention = me.mention
-            self.user.name = me.first_name
-            self.user.username = me.username
-            try:
-                await self.user.join_chat("ArcUpdates")
-                await self.user.join_chat("ArcChatz")
-            except:
-                pass
-            LOGS.info(f"\x3e\x3e\x20{self.user.name}\x20\x69\x73\x20\x6f\x6e\x6c\x69\x6e\x65\x20\x6e\x6f\x77\x21")
-        LOGS.info("\x3e\x3e\x20\x42\x6f\x6f\x74\x65\x64\x20\x75\x70\x20\x48\x65\x6c\x6c\x4d\x75\x73\x69\x63\x21")
+            LOGS.info(f">> {self.app.name} is online now!")
+
+        # Start all assistant userbots (up to 4)
+        if self.user_bots:
+            for idx, userbot in enumerate(self.user_bots, start=1):
+                try:
+                    await userbot.start()
+                    me = await userbot.get_me()
+                    userbot.id = me.id
+                    userbot.mention = me.mention
+                    userbot.name = me.first_name
+                    userbot.username = me.username
+
+                    # Keep assistant info
+                    self.assistants.append(
+                        {
+                            "index": idx,
+                            "id": me.id,
+                            "name": me.first_name,
+                            "username": me.username,
+                        }
+                    )
+
+                    # Auto-join your channels from each assistant
+                    try:
+                        await userbot.join_chat("ArcUpdates")
+                        await userbot.join_chat("ArcChatz")
+                    except Exception:
+                        pass
+
+                    LOGS.info(f">> Assistant {idx}: {userbot.name} is online now!")
+                except Exception as e:
+                    LOGS.error(f">> Failed to start assistant {idx}: {e}")
+
+        LOGS.info(">> Booted up HellMusic with assistants!")
 
     async def logit(self, hash: str, log: str, file: str = None):
         log_text = f"#{hash.upper()} \n\n{log}"
