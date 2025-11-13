@@ -10,7 +10,7 @@ from lyricsgenius import Genius
 from pyrogram.types import CallbackQuery
 from youtubesearchpython.__future__ import VideosSearch
 
-import config
+from config import Config
 from Music.core.clients import hellbot
 from Music.core.logger import LOGS
 from Music.helpers.strings import TEXTS
@@ -40,7 +40,7 @@ async def download_song_api(link: str):
     Use the external SONG API (if configured) to download audio.
     Returns the local file path on success, or None on failure.
     """
-    if not (config.API_URL and config.API_KEY):
+    if not (Config.API_URL and Config.API_KEY):
         return None
 
     video_id = _extract_video_id(link)
@@ -52,7 +52,7 @@ async def download_song_api(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    song_url = f"{config.API_URL}/song/{video_id}?api={config.API_KEY}"
+    song_url = f"{Config.API_URL}/song/{video_id}?api={Config.API_KEY}"
 
     async with aiohttp.ClientSession() as session:
         data = None
@@ -101,7 +101,7 @@ async def download_video_api(link: str):
     Use the external VIDEO API (if configured) to download video.
     Returns the local file path on success, or None on failure.
     """
-    if not (confg.VIDEO_API_URL and config.API_KEY):
+    if not (Confg.VIDEO_API_URL and Config.API_KEY):
         return None
 
     video_id = _extract_video_id(link)
@@ -113,7 +113,7 @@ async def download_video_api(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    video_url = f"{config.VIDEO_API_URL}/video/{video_id}?api={config.API_KEY}"
+    video_url = f"{Config.VIDEO_API_URL}/video/{video_id}?api={Config.API_KEY}"
 
     async with aiohttp.ClientSession() as session:
         data = None
