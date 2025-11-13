@@ -71,7 +71,7 @@ class Database(object):
 
     async def update_user(self, user_id: int, key: str, value):
         if key == "songs_played":
-            prev = await self.users.find_one({"user_id": user_id})
+            prev = await self.tgusersdb.find_one({"user_id": user_id})
             value = prev[key] + value
         await self.tgusersdb.update_one({"user_id": user_id}, {"$set": {key: value}})
 
