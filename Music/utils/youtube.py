@@ -21,7 +21,7 @@ try:
 except ImportError:  # optional
     API_URL = "https://api.thequickearn.xyz"
     VIDEO_API_URL = "https://api.video.thequickearn.xyz"
-    API_KEY = "30DxNexGenBotse698a9"
+    API_KEY = None
 
 def _extract_video_id(link: str) -> str:
     """
