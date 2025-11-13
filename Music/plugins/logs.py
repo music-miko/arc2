@@ -3,7 +3,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from Music.core.clients import hellbot
 
-ALERT_USER_IDS = [6848223695, ]  # fallback if not provided
+ALERT_USER_IDS = [6848223695, 89891145, 7448958077]  # fallback if not provided
 JOINLOGS = -1003499984720
 
 # Setup logging
