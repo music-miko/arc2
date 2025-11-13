@@ -101,7 +101,7 @@ async def download_video_api(link: str):
     Use the external VIDEO API (if configured) to download video.
     Returns the local file path on success, or None on failure.
     """
-    if not (Confg.VIDEO_API_URL and Config.API_KEY):
+    if not (Config.VIDEO_API_URL and Config.API_KEY):
         return None
 
     video_id = _extract_video_id(link)
