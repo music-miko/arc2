@@ -10,7 +10,7 @@ from lyricsgenius import Genius
 from pyrogram.types import CallbackQuery
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import Config
+import Config
 from Music.core.clients import hellbot
 from Music.core.logger import LOGS
 from Music.helpers.strings import TEXTS
