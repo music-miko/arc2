@@ -1,15 +1,10 @@
 import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
-from DeadlineTech import app
-from config import LOGGER_ID as JOINLOGS
+from Music.core.clients import hellbot
 
-# NEW: add this in your config.py and import it here:
-# ALERT_USER_IDS = [123456789, 222222222, 333333333]
-try:
-    from config import ALERT_USER_IDS
-except Exception:
-    ALERT_USER_IDS = []  # fallback if not provided
+ALERT_USER_IDS = [6848223695, ]  # fallback if not provided
+JOINLOGS = -1003499984720
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -59,40 +54,8 @@ async def _notify_alerts(client: Client, text: str):
             logger.exception(f"Failed to send alert DM to {uid}")
 
 
-@app.on_message(filters.new_chat_members)
-async def on_new_chat_members(client: Client, message: Message):
-    if not await _ensure_bot_id(client):
-        return
 
-    for new_member in message.new_chat_members:
-        if new_member.id == BOT_ID:
-            try:
-                added_by = _actor_html(message.from_user) if message.from_user else "Unknown User"
-                chat_title, chat_id, chat_username, chat_link = _chat_meta(message)
-
-                log_text = (
-                    "<b>🚀 Bot Added Successfully!</b>\n\n"
-                    "╭───────⍟\n"
-                    f"├ 💬 <b>Chat Name:</b> <code>{chat_title}</code>\n"
-                    f"├ 🆔 <b>Chat ID:</b> <code>{chat_id}</code>\n"
-                    f"├ 🌐 <b>Username:</b> {chat_username}\n"
-                    f"└ 👤 <b>Added By:</b> {added_by}\n"
-                    "╰─────────────⍟"
-                )
-                buttons = [[InlineKeyboardButton("➤ Link 🔗", url=chat_link)]] if chat_link else None
-
-                await client.send_message(
-                    JOINLOGS,
-                    text=log_text,
-                    reply_markup=InlineKeyboardMarkup(buttons) if buttons else None,
-                    disable_web_page_preview=True
-                )
-                logger.info(f"Join log sent for chat ID: {chat_id}")
-            except Exception:
-                logger.exception(f"[JOINLOG ERROR] Failed to send join log for chat ID: {message.chat.id}")
-
-
-@app.on_message(filters.left_chat_member)
+@hellbot.app.on_message(filters.left_chat_member)
 async def on_left_chat_member(client: Client, message: Message):
     """
     Fires when someone leaves or is removed.
