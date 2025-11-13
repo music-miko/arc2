@@ -23,7 +23,7 @@ from Music.utils.exceptions import (
     UserException,
 )
 from Music.utils.queue import Queue
-from Music.utils.thumbnail import generate as thumb 
+from Music.utils.thumbnail import thumb 
 from Music.utils.youtube import ytube
 
 from .clients import hellbot
