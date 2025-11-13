@@ -108,7 +108,7 @@ def generate(video_id: str, dark: bool = False) -> str:
     # TEAM ARC Watermark
     # --------------------------
     watermark_text = "Team Arc"
-    watermark_font = ImageFont.truetype("./resources/fonts/cindilcondlight.ttf", 45)
+    watermark_font = ImageFont.truetype("./resources/fonts/xcb.ttf", 45)
 
     wm_w, wm_h = watermark_font.getsize(watermark_text)
     wm_x = base_image.width - wm_w - 50
