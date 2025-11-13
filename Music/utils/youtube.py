@@ -14,7 +14,6 @@ from config import Config
 from Music.core.clients import hellbot
 from Music.core.logger import LOGS
 from Music.helpers.strings import TEXTS
-from config import API_URL, VIDEO_API_URL, API_KEY
 
 
 def _extract_video_id(link: str) -> str:
@@ -41,7 +40,7 @@ async def download_song_api(link: str):
     Use the external SONG API (if configured) to download audio.
     Returns the local file path on success, or None on failure.
     """
-    if not (API_URL and API_KEY):
+    if not (config.API_URL and config.API_KEY):
         return None
 
     video_id = _extract_video_id(link)
@@ -53,7 +52,7 @@ async def download_song_api(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
+    song_url = f"{config.API_URL}/song/{video_id}?api={config.API_KEY}"
 
     async with aiohttp.ClientSession() as session:
         data = None
@@ -102,7 +101,7 @@ async def download_video_api(link: str):
     Use the external VIDEO API (if configured) to download video.
     Returns the local file path on success, or None on failure.
     """
-    if not (VIDEO_API_URL and API_KEY):
+    if not (confg.VIDEO_API_URL and config.API_KEY):
         return None
 
     video_id = _extract_video_id(link)
@@ -114,7 +113,7 @@ async def download_video_api(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    video_url = f"{VIDEO_API_URL}/video/{video_id}?api={API_KEY}"
+    video_url = f"{config.VIDEO_API_URL}/video/{video_id}?api={config.API_KEY}"
 
     async with aiohttp.ClientSession() as session:
         data = None
