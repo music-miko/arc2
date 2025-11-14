@@ -1,3 +1,4 @@
+import asyncio
 from pyrogram import idle
 
 from config import Config
@@ -72,4 +73,7 @@ async def start_bot():
 
 
 if __name__ == "__main__":
-    hellbot.run(start_bot())
+    try:
+        asyncio.run(start_bot())
+    except (KeyboardInterrupt, SystemExit):
+        pass
