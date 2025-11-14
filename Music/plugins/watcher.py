@@ -18,7 +18,7 @@ from Music.utils.queue import Queue
 
 
 @hellbot.app.on_message(filters.private, group=2)
-async def new_users(_, msg: Message):
+async def new_users_private(_, msg: Message):
     chat_id = msg.from_user.id
     user_name = msg.from_user.first_name
     if not await db.is_user_exist(chat_id):
@@ -27,7 +27,9 @@ async def new_users(_, msg: Message):
         if Config.LOGGER_ID:
             await hellbot.logit(
                 "newuser",
-                f"**⤷ User:** {msg.from_user.mention(style='md')}\n**⤷ ID:** `{chat_id}`\n__⤷ Started @{BOT_USERNAME} !!__",
+                f"**⤷ User:** {msg.from_user.mention(style='md')}\n"
+                f"**⤷ ID:** `{chat_id}`\n"
+                f"__⤷ Started @{BOT_USERNAME} !!__",
             )
         else:
             LOGS.info(f"#NewUser: \n\nName: {user_name} \nID: {chat_id}")
@@ -40,7 +42,7 @@ async def new_users(_, msg: Message):
 
 
 @hellbot.app.on_message(filters.group, group=3)
-async def new_users(_, msg: Message):
+async def new_users_group(_, msg: Message):
     chat_id = msg.chat.id
     if not await db.is_chat_exist(chat_id):
         BOT_USERNAME = hellbot.app.username
@@ -48,11 +50,16 @@ async def new_users(_, msg: Message):
         if Config.LOGGER_ID:
             await hellbot.logit(
                 "newchat",
-                f"**⤷ Chat Title:** {msg.chat.title} \n**⤷ Chat UN:** @{msg.chat.username or None}) \n**⤷ Chat ID:** `{chat_id}` \n__⤷ ADDED @{BOT_USERNAME} !!__",
+                f"**⤷ Chat Title:** {msg.chat.title} \n"
+                f"**⤷ Chat UN:** @{msg.chat.username or None}) \n"
+                f"**⤷ Chat ID:** `{chat_id}` \n"
+                f"__⤷ ADDED @{BOT_USERNAME} !!__",
             )
         else:
             LOGS.info(
-                f"#NEWCHAT: \n\nChat Title: {msg.chat.title} \nChat UN: @{msg.chat.username}) \nChat ID: {chat_id} \n\nADDED @{BOT_USERNAME} !!",
+                f"#NEWCHAT: \n\nChat Title: {msg.chat.title} \n"
+                f"Chat UN: @{msg.chat.username}) \n"
+                f"Chat ID: {chat_id} \n\nADDED @{BOT_USERNAME} !!",
             )
     await msg.continue_propagation()
 
@@ -68,43 +75,69 @@ async def vc_end(_, msg: Message):
     await msg.continue_propagation()
 
 
-@hellmusic.music.on_kicked()
-@hellmusic.music.on_left()
-async def end_streaming(_, chat_id: int):
-    await hellmusic.leave_vc(chat_id)
-    await db.set_loop(chat_id, 0)
+# ============================================================
+#   MULTI–ASSISTANT EVENT BINDING (ALL PYTGCALLS CLIENTS)
+# ============================================================
+
+# Collect all PyTgCalls clients we need to listen to:
+MUSIC_CLIENTS = getattr(hellmusic, "_music_clients", None)
+if not MUSIC_CLIENTS:
+    # fallback for single-assistant / legacy mode
+    base = getattr(hellmusic, "music", None)
+    MUSIC_CLIENTS = [base] if base else []
 
 
-@hellmusic.music.on_stream_end()
-async def changed(_, update: Update):
-    if isinstance(update, StreamAudioEnded):
-        await hellmusic.change_vc(update.chat_id)
+# We register the same handlers on EACH PyTgCalls client, so
+# all assistants (1–4) correctly trigger these events.
 
 
-@hellmusic.music.on_participants_change()
-async def members_change(_, update: Update):
-    if not isinstance(update, JoinedGroupCallParticipant) and not isinstance(
-        update, LeftGroupCallParticipant
-    ):
-        return
-    try:
-        chat_id = update.chat_id
-        audience = hellmusic.audience.get(chat_id)
-        users = await hellmusic.vc_participants(chat_id)
-        user_ids = [user.user_id for user in users]
-        if not audience:
-            await hellmusic.autoend(chat_id, user_ids)
-        else:
-            new = (
-                audience + 1
-                if isinstance(update, JoinedGroupCallParticipant)
-                else audience - 1
-            )
-            hellmusic.audience[chat_id] = new
-            await hellmusic.autoend(chat_id, user_ids)
-    except:
-        return
+for _mc in MUSIC_CLIENTS:
 
+    @_mc.on_kicked()
+    @_mc.on_left()
+    async def _end_streaming(_, chat_id: int):
+        try:
+            await hellmusic.leave_vc(chat_id)
+            await db.set_loop(chat_id, 0)
+        except:
+            pass
+
+    @_mc.on_stream_end()
+    async def _changed(_, update: Update):
+        if isinstance(update, StreamAudioEnded):
+            try:
+                await hellmusic.change_vc(update.chat_id)
+            except Exception:
+                pass
+
+    @_mc.on_participants_change()
+    async def _members_change(_, update: Update):
+        if not isinstance(update, JoinedGroupCallParticipant) and not isinstance(
+            update, LeftGroupCallParticipant
+        ):
+            return
+        try:
+            chat_id = update.chat_id
+            audience = hellmusic.audience.get(chat_id)
+            users = await hellmusic.vc_participants(chat_id)
+            user_ids = [user.user_id for user in users]
+            if not audience:
+                await hellmusic.autoend(chat_id, user_ids)
+            else:
+                new = (
+                    audience + 1
+                    if isinstance(update, JoinedGroupCallParticipant)
+                    else audience - 1
+                )
+                hellmusic.audience[chat_id] = new
+                await hellmusic.autoend(chat_id, user_ids)
+        except:
+            return
+
+
+# ============================================================
+#   WATCHERS & LEADERBOARD
+# ============================================================
 
 async def update_played():
     while not await asyncio.sleep(1):
