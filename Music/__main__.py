@@ -21,11 +21,13 @@ async def start_bot():
         "\x41\x6c\x6c\x20\x43\x68\x65\x63\x6b\x73\x20\x43\x6f\x6d\x70\x6c\x65\x74\x65\x64\x21\x20\x4c\x65\x74\x27\x73\x20\x53\x74\x61\x72\x74\x20\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x2e\x2e\x2e"
     )
 
+    # Boot all components
     await user_data.setup()
     await hellbot.start()
     await hellmusic.start()
     await db.connect()
 
+    # Boot log
     try:
         if Config.BOT_PIC:
             await hellbot.app.send_photo(
@@ -61,15 +63,41 @@ async def start_bot():
         f"\x3e\x3e\x20\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x20\x5b{hmusic_version}\x5d\x20\x69\x73\x20\x6e\x6f\x77\x20\x6f\x6e\x6c\x69\x6e\x65\x21"
     )
 
+    # Main loop – keep bot alive until Ctrl+C / stop
     await idle()
 
-    await hellbot.app.send_message(
-        Config.LOGGER_ID,
-        f"\x23\x53\x54\x4f\x50\n\n**\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x20\x5b{hmusic_version}\x5d\x20\x69\x73\x20\x6e\x6f\x77\x20\x6f\x66\x66\x6c\x69\x6e\x65\x21**",
-    )
+    # On shutdown: send stop message & clean up
+    try:
+        await hellbot.app.send_message(
+            Config.LOGGER_ID,
+            f"\x23\x53\x54\x4f\x50\n\n**\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x20\x5b{hmusic_version}\x5d\x20\x69\x73\x20\x6e\x6f\x77\x20\x6f\x66\x66\x6c\x69\x6e\x65\x21**",
+        )
+    except Exception:
+        pass
+
     LOGS.info(
         f"\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x20\x5b{hmusic_version}\x5d\x20\x69\x73\x20\x6e\x6f\x77\x20\x6f\x66\x66\x6c\x69\x6e\x65\x21"
     )
+
+    # Graceful shutdown for PyTgCalls & clients
+    try:
+        for client in getattr(hellmusic, "_music_clients", []):
+            try:
+                await client.stop()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    try:
+        await hellbot.stop()
+    except Exception:
+        pass
+
+    try:
+        await db.disconnect()
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
