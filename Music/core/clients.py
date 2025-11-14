@@ -6,10 +6,10 @@ from Music.utils.exceptions import HellBotException
 from .logger import LOGS
 
 
-class HellClient:
+class HellClient(Client):
     def __init__(self):
-        # ----------------- BOT CLIENT -----------------
-        self.app = Client(
+        # Initialize the main bot client normally (parent Client)
+        super().__init__(
             "HellMusic",
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
@@ -18,11 +18,11 @@ class HellClient:
             workers=100,
         )
 
-        # ----------------- MULTI ASSISTANTS (UP TO 4) -----------------
-        # Collect all session strings from Config
+        # --- MULTI ASSISTANT SUPPORT (UP TO 4) ---
+        # Collect all session strings that exist in Config
         session_strings = []
 
-        # Primary assistant (backwards compatible)
+        # Old / primary session (backwards compatible)
         if getattr(Config, "HELLBOT_SESSION", None):
             session_strings.append(Config.HELLBOT_SESSION)
 
@@ -49,18 +49,21 @@ class HellClient:
         # Backwards compatibility: primary assistant
         self.user = self.users[0] if self.users else None
 
+        # Backwards compatibility: many places use hellbot.app
+        # Here, main bot client *is* this Client, so app = self
+        self.app = self
+
     async def start(self):
         LOGS.info(">> Booting up HellMusic...")
 
-        # Start bot
-        if Config.BOT_TOKEN:
-            await self.app.start()
-            me = await self.app.get_me()
-            self.app.id = me.id
-            self.app.mention = me.mention
-            self.app.name = me.first_name
-            self.app.username = me.username
-            LOGS.info(f">> {self.app.name} is online now!")
+        # Start main bot (this Client)
+        await super().start()
+        me = await self.get_me()
+        self.id = me.id
+        self.mention = me.mention
+        self.name = me.first_name
+        self.username = me.username
+        LOGS.info(f">> {self.name} is online now!")
 
         # Start all assistants (up to 4)
         if self.users:
@@ -85,28 +88,15 @@ class HellClient:
 
         LOGS.info(">> Booted up HellMusic!")
 
-    async def stop(self):
-        # Graceful shutdown for all clients
-        try:
-            await self.app.stop()
-        except Exception:
-            pass
-
-        for u in getattr(self, "users", []):
-            try:
-                await u.stop()
-            except Exception:
-                pass
-
     async def logit(self, hash: str, log: str, file: str = None):
         log_text = f"#{hash.upper()} \n\n{log}"
         try:
             if file:
-                await self.app.send_document(
+                await self.send_document(
                     Config.LOGGER_ID, file, caption=log_text
                 )
             else:
-                await self.app.send_message(
+                await self.send_message(
                     Config.LOGGER_ID, log_text, disable_web_page_preview=True
                 )
         except Exception as e:
