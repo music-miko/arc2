@@ -215,7 +215,7 @@ class MakeButtons:
     def start_markup(self, username: str):
         buttons = [
             [
-                self.ikb(text="Start Me 🎵", url=f"https://t.me/{username}?start=start"),
+                self.ikb(text="Start Me 🎵", url=f"https://t.me/{username}?startgroup=true"),
             ]
         ]
         return buttons
