@@ -212,6 +212,14 @@ class MakeButtons:
         ]
         return buttons
 
+    def add_markup(self, username: str):
+        buttons = [
+            [
+                self.ikb(text="Add Me To Group 👥", url=f"https://t.me/{username}?startgroup=true"),
+            ]
+        ]
+        return buttons
+    
     def start_markup(self, username: str):
         buttons = [
             [
