@@ -90,7 +90,6 @@ if not MUSIC_CLIENTS:
 # We register the same handlers on EACH PyTgCalls client, so
 # all assistants (1–4) correctly trigger these events.
 
-
 for _mc in MUSIC_CLIENTS:
 
     @_mc.on_kicked()
