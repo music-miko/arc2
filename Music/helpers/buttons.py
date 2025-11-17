@@ -204,18 +204,10 @@ class MakeButtons:
     def source_markup(self):
         buttons = [
             [
-                self.ikb(text="Github ❤️", url="https://github.com/deadlineTech"),
-            ],
-            [
                 self.ikb(text="Under Team Arc", url="https://t.me/ArcBotz"),
             ],
             [
-                self.ikb(text="Support 🎙️", url="https://t.me/ArcChatz"),
-                self.ikb(text="Updates 📣", url="https://t.me/ArcUpdates"),
-            ],
-            [
                 self.ikb(text="🔙", callback_data="help|start"),
-                self.ikb(text="🗑", callback_data="close"),
             ]
         ]
         return buttons
@@ -224,7 +216,6 @@ class MakeButtons:
         buttons = [
             [
                 self.ikb(text="Start Me 🎵", url=f"https://t.me/{username}?start=start"),
-                self.ikb(text="🗑", callback_data="close"),
             ]
         ]
         return buttons
@@ -236,10 +227,11 @@ class MakeButtons:
                 self.ikb(text="Source 📦", callback_data="source"),
             ],
             [
-                self.ikb(text="Add Me To Group 👥", url=f"https://t.me/{username}?startgroup=true"),
+                self.ikb(text="Support 🎙️", url="https://t.me/ArcChatz"),
+                self.ikb(text="Updates 📣", url="https://t.me/ArcUpdates"),
             ],
             [
-                self.ikb(text="🗑", callback_data="close"),
+                self.ikb(text="Add Me To Group 👥", url=f"https://t.me/{username}?startgroup=true"),
             ]
         ]
         return buttons
@@ -248,7 +240,6 @@ class MakeButtons:
         buttons = [
             [
                 self.ikb(text="Get Help ❓", url=f"https://t.me/{username}?start=help"),
-                self.ikb(text="🗑", callback_data="close"),
             ]
         ]
         return buttons
