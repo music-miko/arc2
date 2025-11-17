@@ -8,7 +8,6 @@ from .logger import LOGS
 
 class HellClient(Client):
     def __init__(self):
-        # Bot client
         self.app = Client(
             "HellMusic",
             api_id=Config.API_ID,
@@ -18,41 +17,16 @@ class HellClient(Client):
             workers=100,
         )
 
-        # --- MULTI ASSISTANT SUPPORT (UP TO 4) ---
-        # Collect all session strings that exist in Config
-        session_strings = []
-
-        # Old / primary session (backwards compatible)
-        if getattr(Config, "HELLBOT_SESSION", None):
-            session_strings.append(Config.HELLBOT_SESSION)
-
-        # Optional extra assistants
-        for attr in ("HELLBOT_SESSION2", "HELLBOT_SESSION3", "HELLBOT_SESSION4"):
-            if hasattr(Config, attr):
-                value = getattr(Config, attr)
-                if value:
-                    session_strings.append(value)
-
-        # Create assistant clients list
-        self.users = []
-        for idx, session in enumerate(session_strings, start=1):
-            self.users.append(
-                Client(
-                    f"HellClient{idx}",
-                    api_id=Config.API_ID,
-                    api_hash=Config.API_HASH,
-                    session_string=session,
-                    no_updates=True,
-                )
-            )
-
-        # Backwards compatibility: primary assistant
-        self.user = self.users[0] if self.users else None
+        self.user = Client(
+            "HellClient",
+            api_id=Config.API_ID,
+            api_hash=Config.API_HASH,
+            session_string=Config.HELLBOT_SESSION,
+            no_updates=True,
+        )
 
     async def start(self):
-        LOGS.info(">> Booting up HellMusic...")
-
-        # Start bot
+        LOGS.info("\x3e\x3e\x20\x42\x6f\x6f\x74\x69\x6e\x67\x20\x75\x70\x20\x48\x65\x6c\x6c\x4d\x75\x73\x69\x63\x2e\x2e\x2e")
         if Config.BOT_TOKEN:
             await self.app.start()
             me = await self.app.get_me()
@@ -60,30 +34,21 @@ class HellClient(Client):
             self.app.mention = me.mention
             self.app.name = me.first_name
             self.app.username = me.username
-            LOGS.info(f">> {self.app.name} is online now!")
-
-        # Start all assistants (up to 4)
-        if self.users:
-            for idx, user_client in enumerate(self.users, start=1):
-                await user_client.start()
-                me = await user_client.get_me()
-                user_client.id = me.id
-                user_client.mention = me.mention
-                user_client.name = me.first_name
-                user_client.username = me.username
-
-                try:
-                    await user_client.join_chat("ArcBotz")
-                    await user_client.join_chat("ArcUpdates")
-                except Exception:
-                    # Ignore join errors silently
-                    pass
-
-                LOGS.info(f">> Assistant {idx} ({user_client.name}) is online now!")
-        else:
-            LOGS.info(">> No assistant sessions configured (HELLBOT_SESSION*).")
-
-        LOGS.info(">> Booted up HellMusic!")
+            LOGS.info(f"\x3e\x3e\x20{self.app.name}\x20\x69\x73\x20\x6f\x6e\x6c\x69\x6e\x65\x20\x6e\x6f\x77\x21")
+        if Config.HELLBOT_SESSION:
+            await self.user.start()
+            me = await self.user.get_me()
+            self.user.id = me.id
+            self.user.mention = me.mention
+            self.user.name = me.first_name
+            self.user.username = me.username
+            try:
+                await self.user.join_chat("ArcBotz")
+                await self.user.join_chat("ArcUpdates")
+            except:
+                pass
+            LOGS.info(f"\x3e\x3e\x20{self.user.name}\x20\x69\x73\x20\x6f\x6e\x6c\x69\x6e\x65\x20\x6e\x6f\x77\x21")
+        LOGS.info("\x3e\x3e\x20\x42\x6f\x6f\x74\x65\x64\x20\x75\x70\x20\x48\x65\x6c\x6c\x4d\x75\x73\x69\x63\x21")
 
     async def logit(self, hash: str, log: str, file: str = None):
         log_text = f"#{hash.upper()} \n\n{log}"
