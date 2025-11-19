@@ -23,7 +23,7 @@ class Config(object):
     BOT_NAME = getenv("BOT_NAME", "Arc Music")   # dont put fancy texts here.
     BOT_PIC = getenv("BOT_PIC", "https://files.catbox.moe/b64xz8.jpg")           # put direct link to image here
     LEADERBOARD_TIME = getenv("LEADERBOARD_TIME", "8:00")   # time in 24hr format for leaderboard broadcast
-    LYRICS_API = getenv("LYRICS_API", None)             # from https://docs.genius.com/
+    LYRICS_API = getenv("LYRICS_API", "gIgMyTXuwJoY9VCPNwKdb_RUOA_9mCMmRlbrrdODmNvcpslww_2RIbbWOB8YdBW9")             # from https://docs.genius.com/
     MAX_FAVORITES = int(getenv("MAX_FAVORITES", 30))    # max number of favorite tracks
     PLAY_LIMIT = int(getenv("PLAY_LIMIT", 0))           # time in minutes. 0 for no limit
     PRIVATE_MODE = getenv("PRIVATE_MODE", "off")        # "on" or "off" to enable/disable private mode
