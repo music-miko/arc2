@@ -139,9 +139,6 @@ class MakeButtons:
                     self.ikb("❤️", callback_data=f"add_favorite|{video_id}"),
                     self.ikb("🎛️", callback_data=f"controls|{video_id}|{chat_id}"),
                 ],
-                [
-                    self.ikb("🗑", callback_data="close"),
-                ],
             ]
         return buttons
 
@@ -164,7 +161,6 @@ class MakeButtons:
             ],
             [
                 self.ikb(text="🔙", callback_data=f"player|{video_id}|{chat_id}"),
-                self.ikb(text="🗑", callback_data="close"),
             ],
         ]
         return buttons
