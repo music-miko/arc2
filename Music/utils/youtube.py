@@ -46,14 +46,14 @@ def format_download_stats() -> str:
     total_failed_ytdlp = a_failed_ytdlp + v_failed_ytdlp
 
     return (
-        "**📊 Download Stats (since last restart)**\n\n"
+        "**📊 Download Stats**\n\n"
         f"**Total Requests:** `{total_requests}`\n"
         f"**Total Success:** `{total_success}`\n"
         f"**Total Failed (YT-DLP):** `{total_failed_ytdlp}`\n\n"
-        "`Type   | Total | Success | YT-DLP Failed`\n"
-        "`-------|-------|---------|--------------`\n"
-        f"`Audio  | {a_total:^5} | {a_success:^7} | {a_failed_ytdlp:^12}`\n"
-        f"`Video  | {v_total:^5} | {v_success:^7} | {v_failed_ytdlp:^12}`\n\n"
+        "`Type   | Total | Success | Yt Failed`\n"
+        "`-------|-------|---------|----------`\n"
+        f"`Audio | {a_total:^5} | {a_success:^7} | {a_failed_ytdlp:^12}`\n"
+        f"`Video | {v_total:^5} | {v_success:^7} | {v_failed_ytdlp:^12}`\n\n"
         "_Note: These counters reset when the bot restarts._"
     )
 
