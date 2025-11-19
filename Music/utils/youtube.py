@@ -50,11 +50,11 @@ def format_download_stats() -> str:
         f"**Total Requests:** `{total_requests}`\n"
         f"**Total Success:** `{total_success}`\n"
         f"**Total Failed (YT-DLP):** `{total_failed_ytdlp}`\n\n"
-        "`Type   | Total | Success | Yt Failed`\n"
+        "`Type   | Total | ✅ | Yt ❌`\n"
         "`-------|-------|---------|----------`\n"
         f"`Audio | {a_total:^5} | {a_success:^7} | {a_failed_ytdlp:^12}`\n"
         f"`Video | {v_total:^5} | {v_success:^7} | {v_failed_ytdlp:^12}`\n\n"
-        "_Note: These counters reset when the bot restarts._"
+        "Note: These counters reset when the bot restarts."
     )
 
 
